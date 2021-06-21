@@ -70,45 +70,6 @@ class CALIBRATE:
 				print('shawa shawa')
 
 
-
-# # start_time = rospy.wait_for_message(bot_odom_topic, Odometry).header.stamp.secs
-# start_time = 0
-# print(start_time)
-
-
-
-
-# plot_data = np.zeros([0,3])
-# for pwm in pwms:
-# 	V_runs = []
-# 	W_runs = []
-# 	for run_id in range(iterations):
-# 		data = np.load("./run_"+str(run_id)+"pwm_"+str(pwm))
-# 		t = data[:,0]
-# 		x_path = data[:,1]
-# 		y_path = data[:,2]
-# 		thetas = data[:,3]
-# 		dt = np.ediff1d(t)
-# 		dx = np.ediff1d(x_path)
-# 		dy = np.ediff1d(y_path)
-# 		dtheta = np.ediff1d(thetas)
-# 		ds = np.sqrt(dx*dx+dy*dy)
-# 		v = np.average(ds/dt)
-# 		w = np.average(d_theta/dt)
-# 		V_runs.append(v)
-# 		W_runs.append(w)
-
-# 	V = np.average(V_runs)
-# 	W = np.average(W_runs)
-# 	Vr = (V + W*wheel_dist)/2
-# 	Vl = (V - W*wheel_dist)/2
-# 	plot_data= np.append(plot_data, np.array([[Vl,Vr,pwm]]), axis=0)
-
-# np.save("pwm_vs_wheel_velocities.npy",plot_data)
-
-
-
-
 if __name__ == '__main__':
 	try:
 		rospy.init_node('auto_calibrate',anonymous=True)
