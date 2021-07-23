@@ -16,8 +16,11 @@ def linear_approx(time, pos_x, pos_y, heading):
     dy = np.ediff1d(y_path)
     dtheta = np.ediff1d(thetas)
     ds = np.sqrt(dx * dx + dy * dy)
-    v = np.average(ds/dt)
-    w = np.average(d_theta/dt)
+    # v = np.average(ds/dt)
+    # w = np.average(dtheta/dt)su
+    
+    v = sum(ds)/sum(dt)
+    w = (heading[-1] - heading[0])/(time[-1] - time[0])
 
     return v, w
 
@@ -28,9 +31,9 @@ def circum_center(pos_x, pos_y, num_iterations = 50, eps = 1e-04):
     cen_x = []
     cen_y = []
     for _ in range(num_iterations):
-        id1 = np.random.choice(range(n//3), 1)
-        id2 = np.random.choice(range(n//3, 2 * n//3), 1)
-        id3 = np.random.choice(range(2 * n//3, n), 1)
+        id1 = np.random.choice(range(n//3), 1)[0]
+        id2 = np.random.choice(range(n//3, 2 * n//3), 1)[0]
+        id3 = np.random.choice(range(2 * n//3, n), 1)[0]
         x_a, y_a = (pos_x[id1] + pos_x[id2])/2, (pos_y[id1] + pos_y[id2])/2
         x_b, y_b = (pos_x[id2] + pos_x[id3])/2, (pos_y[id2] + pos_y[id3])/2
         
@@ -59,15 +62,26 @@ def circum_center(pos_x, pos_y, num_iterations = 50, eps = 1e-04):
 
     return x, y, r
 
-def get_velocities(cen, rad, pos_1, pos_2, duration):
-
+def get_velocities(cen, rad, pos_1, pos_2, pos_3, duration, motion):
+    
+    ang_vel = 1
+    lin_vel = 1
     ang1 = math.atan2(pos_1[1] - cen[1], pos_1[0] - cen[0]) % (2 * math.pi)
     ang2 = math.atan2(pos_2[1] - cen[1], pos_2[0] - cen[0]) % (2 * math.pi)
+    ang3 = math.atan2(pos_3[1] - cen[1], pos_3[0] - cen[0]) % (2 * math.pi)
+    if (ang1 < ang2) and (ang3 < ang1 or ang3 > ang2):
+        ang_vel = -1
+    elif (ang3 < ang1) and (ang3 > ang2):
+        ang_vel = -1
+    
+    if motion == 'backward':
+        lin_vel = -1
 
-    w = (ang2 - ang1) / duration
-    v = rad * w
+    ang_vel *= (ang_vel * (ang2 - ang1)) % (2 * math.pi) / duration
 
-    return v, w
+    lin_vel *= abs(rad * ang_vel)
+
+    return lin_vel, ang_vel
 
 
 def jacobian(xs, ys, beta, batch_size = 10):
@@ -91,8 +105,9 @@ def gauss_newton(pos_x, pos_y, eps = 1e-04, batch_size = 10):
 
     beta = circum_center(x_path, y_path)
     err = np.inf
-
+    count = 0
     while err > eps:
+        count += 1
         ids = np.random.choice(range(n), batch_size)
         xs = x_path[ids]
         ys = y_path[ids]
@@ -100,11 +115,11 @@ def gauss_newton(pos_x, pos_y, eps = 1e-04, batch_size = 10):
         jacob = jacobian(xs, ys, beta)
         batch_err = np.sqrt((xs - beta[0]) ** 2 + (ys - beta[1]) ** 2) - beta[2]
         update = np.matmul(np.linalg.pinv(jacob), batch_err)
-
-        err = max(abs(update))
         beta -= update
-        print (beta, err)
-        
+        err = max(abs(np.sqrt((x_path - beta[0]) ** 2 + (y_path - beta[1]) ** 2) - beta[2]))
+        # print (beta, err)
+        if count > 1001:
+            break
     return beta
 
 
