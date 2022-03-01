@@ -56,8 +56,11 @@ def process_data(dir_name):
     pwm_right_backward = []
     low_forward_pwm = 0
     low_backward_pwm = 0
+    i = 0 
     for filename in glob.glob(dir_name + '/calibration_files/pos_1[2-6][0-9]*.csv'):
         print("Processing " + filename)
+        i += 1
+        print(i)
         name = filename.split('/')[-1].split('.')[0].split('_')
         # name_split = filename.split('_')
         pwm = int(name[1])
@@ -100,7 +103,7 @@ def regress(data):
     X_pred = np.array([[c, c ** 2, 1] for c in thetas])
     Y_pred = np.matmul(X_pred, W)
     plt.plot(thetas, Y_pred, 'r')
-    plt.show()
+    # plt.show()
     return W
 
 if __name__ == '__main__':
@@ -150,9 +153,18 @@ if __name__ == '__main__':
     # plt.show()
 
     processed_data = process_data(dirname)
-    data = processed_data[2]
+    # print(processed_data[0])
+    labels = ['low_forward_pwm', 'low_backward_pwm', 'pwm_left_forward', 'pwm_right_forward', 'pwm_left_backward', 'pwm_right_backward']
+    with open(dirname + '/calibration_bot1.yaml', 'w') as f:
+        f.write("{}:{}\n".format(labels[0],processed_data[0]))
+        f.write("{}:{}\n".format(labels[1],processed_data[1]))            
 
-    print(regress(processed_data[2]))
+
+        for i in range(2,len(labels)):
+            weights = regress(processed_data[i])
+            f.write("{}:{}\n".format(labels[i]," ".join(list(map(str,weights)))))
+
+    
 
 
 
