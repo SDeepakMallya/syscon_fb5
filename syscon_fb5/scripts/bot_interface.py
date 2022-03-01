@@ -61,7 +61,9 @@ def encoderOut():
 		encoder.chksum = ord(chksum) == sum%256
 		#rospy.loginfo(encoder)
 		pub_encoder.publish(encoder)
-
+		sharpH = ser.read()
+		sharpL = ser.read()
+		print(ord(sharpH) * 256 + ord(sharpL))
 
 if __name__ == '__main__':
 	try:
