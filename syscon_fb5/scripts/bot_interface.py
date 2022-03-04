@@ -6,7 +6,6 @@ import struct
 from syscon_fb5.msg import PwmInput,EncoderData, Proximity_IR, WhiteLine_Sensor, Sharp_IR
 from syscon_fb5.srv import VelToPWM, VelToPWMResponse
 ser=Serial('/dev/ttyUSB0',9600)
-import rospy
 import yaml
 import numpy as np
 import rospkg
@@ -145,7 +144,7 @@ def sharp_ir():
 def Prox_IR():
     "returns true if there is a object within range of 10 cm"
     prox_ir = Proximity_IR()
-    for i in range(5):
+    for i in range(6):
         proxh = ser.read()
         proxl = ser.read()
         prox = ord(proxh)*256 + ord(proxl)
@@ -158,15 +157,16 @@ def Prox_IR():
 
 def White_sense():
     Wl_sens = WhiteLine_Sensor()
-    WL_irh = ser.read()
-    Wl_irl = ser.read()
-    Wl = ord(WL_irh)*256 + ord(Wl_irl)
-    if Wl > 100:
-        Wl_sens.WhiteLine = False
-    else:
-        Wl_sens.WhiteLine = True
+    for i in range(3):
+        WL_irh = ser.read()
+        Wl_irl = ser.read()
+        Wl = ord(WL_irh)*256 + ord(Wl_irl)  
+        if Wl > 100:
+            Wl_sens.Whiteline[i] = False
+        else:
+            Wl_sens.Whiteline[i] = True
 
-    pub_wl.publish(Wl)
+    pub_wl.publish(Wl_sens)
 
 
 
@@ -183,15 +183,18 @@ if __name__ == '__main__':
         rospy.init_node('bot_interface', anonymous=True)
         rospy.Subscriber('pwm', PwmInput, callback)
         pub_encoder = rospy.Publisher('encoder', EncoderData, queue_size=10)
-        pub_prox_ir = rospy.Publisher('prox_ir',Proximity_IR, Prox_IR)
-        pub_sharp = rospy.Publisher('sharp_ir', Sharp_IR, sharp_ir)
-        pub_wl = rospy.Publisher('wl',WhiteLine_Sensor , White_sense )
+        pub_prox_ir = rospy.Publisher('prox_ir',Proximity_IR, queue_size=10)
+        pub_sharp = rospy.Publisher('sharp_ir', Sharp_IR, queue_size=10)
+        pub_wl = rospy.Publisher('wl',WhiteLine_Sensor , queue_size=10)
         start_time = rospy.get_time()
         rospy.Service('vel_to_PWM', VelToPWM, Vel_to_PWM)
 
         rate = rospy.Rate(10) #Since bot sends data at 25hz the publisher will be forced to slow down
         while not rospy.is_shutdown():
             encoderOut()
+            Prox_IR()
+            sharp_ir()
+            White_sense()
             # rate.sleep()
     except rospy.ROSInterruptException:
         pass

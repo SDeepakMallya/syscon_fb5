@@ -1,1 +1,1 @@
-bool[] obstacle
+bool[6] obstacle
