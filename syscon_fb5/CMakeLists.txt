@@ -52,6 +52,9 @@ add_message_files(
   FILES
   EncoderData.msg
   PwmInput.msg
+  Proximity_IR.msg
+  Sharp_IR.msg
+  WhiteLine_Sensor.msg
 )
 
 ## Generate services in the 'srv' folder

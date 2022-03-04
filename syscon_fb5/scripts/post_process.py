@@ -1,5 +1,6 @@
 #!usr/bin/env python3
 
+from datetime import datetime
 import circle_1 as circ
 import glob, os
 import math
@@ -56,6 +57,10 @@ def process_data(dir_name):
     pwm_right_backward = []
     low_forward_pwm = 0
     low_backward_pwm = 0
+    max_lin_vel_forward = 0
+    max_lin_vel_backward = 0
+    max_ang_vel = 0
+    min_ang_vel = 0
     i = 0 
     for filename in glob.glob(dir_name + '/calibration_files/pos_1[2-6][0-9]*.csv'):
         print("Processing " + filename)
@@ -70,19 +75,18 @@ def process_data(dir_name):
         init_pos = (x_pos[0], y_pos[0])
         fin_pos = (x_pos[-1], y_pos[-1])
         mid_pos = (x_pos[len(x_pos)//2], y_pos[len(y_pos)//2])
-        max_lin_vel_forward = 0
-        max_lin_vel_backward = 0
-        max_ang_vel = 0
-        min_ang_vel = 0
+
 
         if not is_stationary(x_pos, y_pos):
             cen_x, cen_y, rad = circ.gauss_newton(x_pos, y_pos)
             cen = (cen_x, cen_y)
             vel, ang_vel = circ.get_velocities(cen, rad, init_pos, fin_pos, mid_pos, duration, motion)
+            
             max_lin_vel_forward = max(max_lin_vel_forward,vel)
             max_lin_vel_backward = min(max_lin_vel_backward,vel)
             max_ang_vel = max(ang_vel,max_ang_vel)
             min_ang_vel = min(min_ang_vel,ang_vel)
+
             left_vel, right_vel = wheel_velocities(vel, ang_vel)
 
 
@@ -99,7 +103,7 @@ def process_data(dir_name):
             if motion == 'backward' and pwm > low_backward_pwm:
                 low_backward_pwm = pwm
 
-    return low_forward_pwm, low_backward_pwm, round(0.9*max_lin_vel_forward,3),round(0.9*max_lin_vel_backward,3), round(0.9*max_ang_vel,3),round(0.9*min_ang_vel,3), pwm_left_forward, pwm_right_forward, pwm_left_backward, pwm_right_backward
+    return low_forward_pwm, low_backward_pwm, round(0.9*max_lin_vel_forward,5),round(0.9*max_lin_vel_backward,5), round(0.9*max_ang_vel,5),round(0.9*min_ang_vel,5), pwm_left_forward, pwm_right_forward, pwm_left_backward, pwm_right_backward
 
 
 def regress(data):
@@ -165,13 +169,14 @@ if __name__ == '__main__':
     # print(processed_data[0])
     labels = ['pwm_left_forward', 'pwm_right_forward', 'pwm_left_backward', 'pwm_right_backward']
     label1 = ['low_forward_pwm', 'low_backward_pwm', 'max_lin_vel_forward', 'max_lin_vel_backward', 'max_ang_vel', 'min_ang_vel']
-    with open(dirname + '/calibration_bot1.yaml', 'w') as f:
+    with open(dirname + '/calibration.yaml', 'w') as f:
+        f.write("calibration_date: {}\n".format(datetime.now()))
         f.write("{}: {}\n".format(label1[0],processed_data[0]))
         f.write("{}: {}\n".format(label1[1],processed_data[1]))        
         f.write("{}: {}\n".format(label1[2],processed_data[2]))  
         f.write("{}: {}\n".format(label1[3],processed_data[3]))      
         f.write("{}: {}\n".format(label1[4],processed_data[4]))  
-        f.write("{}: {}\n".format(label1[5],processed_data[5]))  
+        f.write("{}: {}\n".format(label1[5],processed_data[5]))
         f.write("bot_id: 10\n") 
 
 

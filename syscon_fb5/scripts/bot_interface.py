@@ -3,7 +3,7 @@ import rospy
 from serial import Serial
 # import time
 import struct
-from syscon_fb5.msg import PwmInput,EncoderData, Proximity_IR, WhileLine_Sensor, Sharp_IR
+from syscon_fb5.msg import PwmInput,EncoderData, Proximity_IR, WhiteLine_Sensor, Sharp_IR
 from syscon_fb5.srv import VelToPWM, VelToPWMResponse
 ser=Serial('/dev/ttyUSB0',9600)
 import rospy
@@ -71,9 +71,9 @@ def encoderOut():
         encoder.chksum = ord(chksum) == sum%256
         #rospy.loginfo(encoder)
         pub_encoder.publish(encoder)
-        sharpH = ser.read()
-        sharpL = ser.read()
-        print(ord(sharpH) * 256 + ord(sharpL))
+        # sharpH = ser.read()
+        # sharpL = ser.read()
+        # print(ord(sharpH) * 256 + ord(sharpL))
 
 def wheel_velocities(vel, ang_vel, wheel_base=0.18):
     right_vel = vel + wheel_base*ang_vel/2
@@ -133,11 +133,59 @@ def Vel_to_PWM(cmd_vel):
     return VelToPWMResponse(leftpwm , rightpwm)
     # return leftpwm,rightpwm
 
+def sharp_ir():
+    sharp_ir = Sharp_IR()
+    sharph = ser.read()
+    sharpl = ser.read()
+    sharp = ord(sharph)*256 + ord(sharpl)
+    sharp_ir.obstacle_distance = sharp
+    pub_sharp.publish(sharp_ir)
+
+    
+def Prox_IR():
+    "returns true if there is a object within range of 10 cm"
+    prox_ir = Proximity_IR()
+    for i in range(5):
+        proxh = ser.read()
+        proxl = ser.read()
+        prox = ord(proxh)*256 + ord(proxl)
+        if prox < 95:
+            prox_ir.obstacle[i] = True
+        else:
+            prox_ir.obstacle[i] = False
+
+    pub_prox_ir.publish(prox_ir)
+
+def White_sense():
+    Wl_sens = WhiteLine_Sensor()
+    WL_irh = ser.read()
+    Wl_irl = ser.read()
+    Wl = ord(WL_irh)*256 + ord(Wl_irl)
+    if Wl > 100:
+        Wl_sens.WhiteLine = False
+    else:
+        Wl_sens.WhiteLine = True
+
+    pub_wl.publish(Wl)
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     try:
         rospy.init_node('bot_interface', anonymous=True)
         rospy.Subscriber('pwm', PwmInput, callback)
         pub_encoder = rospy.Publisher('encoder', EncoderData, queue_size=10)
+        pub_prox_ir = rospy.Publisher('prox_ir',Proximity_IR, Prox_IR)
+        pub_sharp = rospy.Publisher('sharp_ir', Sharp_IR, sharp_ir)
+        pub_wl = rospy.Publisher('wl',WhiteLine_Sensor , White_sense )
         start_time = rospy.get_time()
         rospy.Service('vel_to_PWM', VelToPWM, Vel_to_PWM)
 
