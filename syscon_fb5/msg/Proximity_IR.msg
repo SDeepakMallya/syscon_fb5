@@ -1,1 +1,1 @@
-bool[6] obstacle
+bool[4] obstacle

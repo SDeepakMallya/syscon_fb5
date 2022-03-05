@@ -17,7 +17,7 @@ def heading_from_quaternion(x, y, z, w):
 
 class CALIBRATE:
 	def __init__(self):
-		self.iterations = 1
+		self.iterations = 3
 		self.intervals = 5
 		self.pwms = range(0, 256, self.intervals)
 		self.output_folder = dirname + '/calibration_files/'

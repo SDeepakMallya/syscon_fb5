@@ -144,11 +144,11 @@ def sharp_ir():
 def Prox_IR():
     "returns true if there is a object within range of 10 cm"
     prox_ir = Proximity_IR()
-    for i in range(6):
+    for i in range(4):
         proxh = ser.read()
         proxl = ser.read()
         prox = ord(proxh)*256 + ord(proxl)
-        if prox < 95:
+        if prox < 145:
             prox_ir.obstacle[i] = True
         else:
             prox_ir.obstacle[i] = False
@@ -161,7 +161,7 @@ def White_sense():
         WL_irh = ser.read()
         Wl_irl = ser.read()
         Wl = ord(WL_irh)*256 + ord(Wl_irl)  
-        if Wl > 100:
+        if Wl > 40:
             Wl_sens.Whiteline[i] = False
         else:
             Wl_sens.Whiteline[i] = True
