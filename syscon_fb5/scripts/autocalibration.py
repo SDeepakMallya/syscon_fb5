@@ -19,7 +19,7 @@ class CALIBRATE:
 	def __init__(self):
 		self.iterations = 3
 		self.intervals = 5
-		self.pwms = range(0, 256, self.intervals)
+		self.pwms = range(100, 256, self.intervals)
 		self.output_folder = dirname + '/calibration_files/'
 		self.pos_x = 0.
 		self.pos_y = 0.
@@ -27,7 +27,7 @@ class CALIBRATE:
 		self.current_time = 0.
 		self.run_duration = 5.
 		self.output_file = open(self.output_folder + '/temp.csv', 'w+')
-		# rospy.Subscriber('/vicon/fb5_10/fb5_10', TransformStamped, s.callback_odom)
+		rospy.Subscriber('/vicon/fb5_10/fb5_10', TransformStamped, s.callback_odom)
 		self.execute_pwms()
 
 	
@@ -47,6 +47,7 @@ class CALIBRATE:
 	def execute_pwms(self):
 		print("Here")
 		self.output_file.close()
+		r =rospy.Rate(100)
 		for pwm in self.pwms:
 			for run_id in range(self.iterations):
 				start = rospy.get_time()
@@ -55,28 +56,33 @@ class CALIBRATE:
 					pwm_msg = PwmInput()
 					pwm_msg.rightInput = pwm
 					pwm_msg.leftInput = pwm
-					# pub_pwm.publish(pwm_msg)
-					rospy.sleep(0.1)
+					pub_pwm.publish(pwm_msg)
+					# rospy.sleep(0.5)
+					r.sleep()
 				self.output_file.close()
 
-				print('balle balle')
+				pwm_msg.rightInput = 0
+				pwm_msg.leftInput = 0
+				rospy.sleep(0.5)
+
 				start = rospy.get_time()
 				self.output_file = open(self.output_folder + '/pos_{}_backward_{}.csv'.format(pwm, run_id), 'w+')
 				while rospy.get_time() - start < self.run_duration:
 					pwm_msg = PwmInput()
 					pwm_msg.rightInput = -pwm
 					pwm_msg.leftInput = -pwm
-					# pub_pwm.publish(pwm_msg)
-					rospy.sleep(0.1)
+					pub_pwm.publish(pwm_msg)
+					r.sleep()
+					# rospy.sleep(0.05)
 				self.output_file.close()
 
-				print('shawa shawa')
+				print('PWM input: {}, run_id: {}'.format(pwm,run_id))
 
 
 if __name__ == '__main__':
 	try:
 		rospy.init_node('auto_calibrate', anonymous=True)
-		pub_pwm = rospy.Publisher('/pwm', PwmInput, queue_size=10)
+		pub_pwm = rospy.Publisher('/pwm', PwmInput, queue_size=2)
 		print("HERE TOO")
 		s = CALIBRATE()
 
