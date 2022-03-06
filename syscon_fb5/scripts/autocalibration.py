@@ -27,7 +27,7 @@ class CALIBRATE:
 		self.current_time = 0.
 		self.run_duration = 5.
 		self.output_file = open(self.output_folder + '/temp.csv', 'w+')
-		rospy.Subscriber('/vicon/fb5_10/fb5_10', TransformStamped, s.callback_odom)
+		rospy.Subscriber('/vicon/fb5_10/fb5_10', TransformStamped, self.callback_odom)
 		self.execute_pwms()
 
 	
@@ -63,6 +63,7 @@ class CALIBRATE:
 
 				pwm_msg.rightInput = 0
 				pwm_msg.leftInput = 0
+				pub_pwm.publish(pwm_msg)
 				rospy.sleep(0.5)
 
 				start = rospy.get_time()
@@ -77,7 +78,10 @@ class CALIBRATE:
 				self.output_file.close()
 
 				print('PWM input: {}, run_id: {}'.format(pwm,run_id))
-
+				pwm_msg.rightInput = 0
+				pwm_msg.leftInput = 0
+				pub_pwm.publish(pwm_msg)
+				rospy.sleep(0.5)
 
 if __name__ == '__main__':
 	try:
