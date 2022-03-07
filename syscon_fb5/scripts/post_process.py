@@ -3,9 +3,9 @@
 from datetime import datetime
 import circle_1 as circ
 import glob, os
-import math
+# import math
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import rospkg
 dirname = rospkg.RosPack().get_path('syscon_fb5')
 
@@ -111,11 +111,11 @@ def regress(data):
     X = np.array([[c[1]** 2, c[1] , 1] for c in data])
     Y = np.array([c[0] for c in data])
     W = np.matmul(np.linalg.pinv(X), Y)
-    plt.scatter(X[:,0], Y)
+    # plt.scatter(X[:,0], Y)
     thetas = np.linspace(min(X[:,0]), max(X[:,0]), 100)
     X_pred = np.array([[c** 2, c , 1] for c in thetas])
     Y_pred = np.matmul(X_pred, W)
-    plt.plot(thetas, Y_pred, 'r')
+    # plt.plot(thetas, Y_pred, 'r')
     # plt.show()
     return W
 
