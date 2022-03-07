@@ -62,7 +62,7 @@ def process_data(dir_name):
     max_ang_vel = 0
     min_ang_vel = 0
     i = 0 
-    for filename in glob.glob(dir_name + '/calibration_files/pos_1[2-6][0-9]*.csv'):
+    for filename in glob.glob(dir_name + '/calibration_files/pos_*.csv'):
         print("Processing " + filename)
         i += 1
         print(i)
