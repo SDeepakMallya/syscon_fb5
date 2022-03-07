@@ -20,7 +20,7 @@ class CALIBRATE:
 		self.iterations = 3
 		self.intervals = 5
 		self.pwms = range(100, 256, self.intervals)
-		self.output_folder = dirname + '/calibration_files/'
+		self.output_folder = dirname + '/calibration_files'
 		self.pos_x = 0.
 		self.pos_y = 0.
 		self.heading = 0.
