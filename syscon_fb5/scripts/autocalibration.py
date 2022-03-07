@@ -26,7 +26,7 @@ class CALIBRATE:
 		self.heading = 0.
 		self.current_time = 0.
 		self.run_duration = 5.
-		self.output_file = open(self.output_folder + '/temp.csv', 'w+')
+		self.output_file = open(self.output_folder + '/temp.csv', 'w')
 		rospy.Subscriber('/vicon/fb5_10/fb5_10', TransformStamped, self.callback_odom)
 		self.execute_pwms()
 
@@ -51,7 +51,7 @@ class CALIBRATE:
 		for pwm in self.pwms:
 			for run_id in range(self.iterations):
 				start = rospy.get_time()
-				self.output_file = open(self.output_folder + '/pos_{}_forward_{}.csv'.format(pwm, run_id), 'w+')
+				self.output_file = open(self.output_folder + '/pos_{}_forward_{}.csv'.format(pwm, run_id), 'w')
 				while rospy.get_time() - start < self.run_duration:
 					pwm_msg = PwmInput()
 					pwm_msg.rightInput = pwm
@@ -67,7 +67,7 @@ class CALIBRATE:
 				rospy.sleep(0.5)
 
 				start = rospy.get_time()
-				self.output_file = open(self.output_folder + '/pos_{}_backward_{}.csv'.format(pwm, run_id), 'w+')
+				self.output_file = open(self.output_folder + '/pos_{}_backward_{}.csv'.format(pwm, run_id), 'w')
 				while rospy.get_time() - start < self.run_duration:
 					pwm_msg = PwmInput()
 					pwm_msg.rightInput = -pwm
