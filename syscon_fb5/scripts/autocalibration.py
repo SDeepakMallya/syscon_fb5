@@ -63,6 +63,7 @@ class CALIBRATE:
 
 				pwm_msg.rightInput = 0
 				pwm_msg.leftInput = 0
+				pub_pwm.publish(pwm_msg)
 				rospy.sleep(0.5)
 
 				start = rospy.get_time()
@@ -77,7 +78,10 @@ class CALIBRATE:
 				self.output_file.close()
 
 				print('PWM input: {}, run_id: {}'.format(pwm,run_id))
-
+				pwm_msg.rightInput = 0
+				pwm_msg.leftInput = 0
+				pub_pwm.publish(pwm_msg)
+				rospy.sleep(0.5)
 
 if __name__ == '__main__':
 	try:
