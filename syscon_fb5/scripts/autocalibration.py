@@ -40,12 +40,13 @@ class CALIBRATE:
 		self.heading = heading_from_quaternion(orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w)
 		try:
 			self.output_file.write('{}, {}, {}, {}\n'.format(self.current_time, self.pos_x, self.pos_y, self.heading))
+			print("writting to {}".format(self.output_file.name))
 		except:
 			print('No Output File Found!')
 			pass
 
 	def execute_pwms(self):
-		print("Here")
+		# print("Here")
 		self.output_file.close()
 		r =rospy.Rate(100)
 		for pwm in self.pwms:
@@ -87,7 +88,7 @@ if __name__ == '__main__':
 	try:
 		rospy.init_node('auto_calibrate', anonymous=True)
 		pub_pwm = rospy.Publisher('/pwm', PwmInput, queue_size=2)
-		print("HERE TOO")
+		# print("HERE TOO")
 		s = CALIBRATE()
 
 	except rospy.ROSInterruptException:
