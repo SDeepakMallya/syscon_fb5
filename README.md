@@ -11,7 +11,7 @@ Please refer [Firebird 5 AVR C code](https://github.com/RugvedKatole/firebird-5-
 
 Install the following libraries from requirements.txt file
 
-`pip3 install requirements.txt`
+`pip3 install -r requirements.txt`
 
 more to be added
 
