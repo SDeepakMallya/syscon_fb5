@@ -21,7 +21,7 @@ Run this file before running any other scripts
 
 `rosrun syscon_fb5 bot_interface.py`
 
-#### Topics and serivices
+#### Topics and services
 1. PWM : In this topic Right and Left PWM inputs are published which then are sent to bot
 2. encoder: Here Encoder readings are published
 3. prox_ir: Here a boolean vector of size 4 is published indicating true if there is a obstacle in vicinity false otherwise
