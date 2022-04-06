@@ -39,6 +39,7 @@ class CALIBRATE:
 		orientation_q = data.transform.rotation
 		self.heading = heading_from_quaternion(orientation_q.x, orientation_q.y, orientation_q.z, orientation_q.w)
 		try:
+			print("callback writing")
 			self.output_file.write('{}, {}, {}, {}\n'.format(self.current_time, self.pos_x, self.pos_y, self.heading))
 			print("writting to {}".format(self.output_file.name))
 		except:
