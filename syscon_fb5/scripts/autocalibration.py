@@ -28,6 +28,7 @@ class CALIBRATE:
 		self.run_duration = 5.
 		self.output_file = open(self.output_folder + '/temp.csv', 'w+')
 		rospy.Subscriber('/vicon/fb5_10/fb5_10', TransformStamped, self.callback_odom)
+		print("init")
 		self.execute_pwms()
 
 	
