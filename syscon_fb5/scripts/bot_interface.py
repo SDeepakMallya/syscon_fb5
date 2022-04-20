@@ -5,12 +5,11 @@ from serial import Serial
 import struct
 from syscon_fb5.msg import PwmInput,EncoderData, Proximity_IR, WhiteLine_Sensor, Sharp_IR
 from syscon_fb5.srv import VelToPWM, VelToPWMResponse
-ser=Serial('/dev/ttyUSB0',9600)
 import yaml
 import numpy as np
 import rospkg
 
-
+ser=Serial('/dev/ttyUSB0',9600)
 ser.flushInput()
 ser.flushOutput()
 ser.write(bytes('8', 'utf-8'))
@@ -129,7 +128,7 @@ def Vel_to_PWM(cmd_vel):
         if rightpwm < -255:
             rightpwm = -255
 
-    return VelToPWMResponse(leftpwm , rightpwm)
+    return VelToPWMResponse(rightpwm , leftpwm)
     # return leftpwm,rightpwm
 
 def sharp_ir():
@@ -168,12 +167,9 @@ def White_sense():
 
     pub_wl.publish(Wl_sens)
 
-
-
-
-
-
-
+def callback_vel(data):
+    v = data.linear.x
+    w = data.angular.z
 
 
 
