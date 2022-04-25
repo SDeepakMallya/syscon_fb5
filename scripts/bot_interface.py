@@ -80,6 +80,7 @@ def wheel_velocities(vel, ang_vel, wheel_base=0.18):
     return left_vel, right_vel
 
 def Vel_to_PWM(cmd_vel):
+    print("called")
 # def Vel_to_PWM(linear_vel,angular_vel,bot_id):
     linear_vel = cmd_vel.linear.x
     angular_vel = cmd_vel.angular.z
@@ -129,7 +130,8 @@ def Vel_to_PWM(cmd_vel):
         rightpwm = int(rightpwm.dot(w))
         if rightpwm < -255:
             rightpwm = -255
-    
+    pwm = PwmInput(rightpwm,leftpwm)
+    pub_pwm.publish(pwm)
     # return VelToPWMResponse(rightpwm , leftpwm)
     # return leftpwm,rightpwm
 
@@ -178,10 +180,11 @@ if __name__ == '__main__':
         rospy.init_node('bot_interface', anonymous=True)
         rospy.Subscriber('pwm', PwmInput, callback)
         rospy.Subscriber('cmd_vel', Twist, Vel_to_PWM)
-        pub_encoder = rospy.Publisher('encoder', EncoderData, queue_size=10)
-        pub_prox_ir = rospy.Publisher('prox_ir',Proximity_IR, queue_size=10)
-        pub_sharp = rospy.Publisher('sharp_ir', Sharp_IR, queue_size=10)
-        pub_wl = rospy.Publisher('wl',WhiteLine_Sensor , queue_size=10)
+        pub_encoder = rospy.Publisher('encoder', EncoderData, queue_size=1)
+        pub_prox_ir = rospy.Publisher('prox_ir',Proximity_IR, queue_size=1)
+        pub_sharp = rospy.Publisher('sharp_ir', Sharp_IR, queue_size=1)
+        pub_wl = rospy.Publisher('wl',WhiteLine_Sensor , queue_size=1)
+        pub_pwm = rospy.Publisher('pwm',PwmInput,queue_size=1)
         start_time = rospy.get_time()
         # rospy.Service('vel_to_PWM', VelToPWM, Vel_to_PWM)
 
