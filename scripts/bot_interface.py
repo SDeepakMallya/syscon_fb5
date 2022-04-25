@@ -4,10 +4,11 @@ from serial import Serial
 # import time
 import struct
 from syscon_fb5.msg import PwmInput,EncoderData, Proximity_IR, WhiteLine_Sensor, Sharp_IR
-from syscon_fb5.srv import VelToPWM, VelToPWMResponse
+# from syscon_fb5.srv import VelToPWM, VelToPWMResponse
 import yaml
 import numpy as np
 import rospkg
+from geometry_msgs.msg import Twist
 
 ser=Serial('/dev/ttyUSB0',9600)
 ser.flushInput()
@@ -79,12 +80,13 @@ def wheel_velocities(vel, ang_vel, wheel_base=0.18):
     return left_vel, right_vel
 
 def Vel_to_PWM(cmd_vel):
-    linear_vel = cmd_vel.linear_vel
-    angular_vel = cmd_vel.angular_vel
-    bot_id = cmd_vel.bot_id
+# def Vel_to_PWM(linear_vel,angular_vel,bot_id):
+    linear_vel = cmd_vel.linear.x
+    angular_vel = cmd_vel.angular.z
+    # bot_id = cmd_vel.bot_id
     left_vel, right_vel = wheel_velocities(linear_vel,angular_vel)
-    if not bot_id == config['bot_id']:
-        return "Wrong bot"
+    # if not bot_id == config['bot_id']:
+        # return "Wrong bot"
     if linear_vel > config['max_lin_vel_forward']:
         linear_vel = config['max_lin_vel_forward']
     elif linear_vel < config['max_lin_vel_backward']:
@@ -127,8 +129,8 @@ def Vel_to_PWM(cmd_vel):
         rightpwm = int(rightpwm.dot(w))
         if rightpwm < -255:
             rightpwm = -255
-
-    return VelToPWMResponse(rightpwm , leftpwm)
+    
+    # return VelToPWMResponse(rightpwm , leftpwm)
     # return leftpwm,rightpwm
 
 def sharp_ir():
@@ -167,9 +169,6 @@ def White_sense():
 
     pub_wl.publish(Wl_sens)
 
-def callback_vel(data):
-    v = data.linear.x
-    w = data.angular.z
 
 
 
@@ -178,19 +177,21 @@ if __name__ == '__main__':
     try:
         rospy.init_node('bot_interface', anonymous=True)
         rospy.Subscriber('pwm', PwmInput, callback)
+        rospy.Subscriber('cmd_vel', Twist, Vel_to_PWM)
         pub_encoder = rospy.Publisher('encoder', EncoderData, queue_size=10)
         pub_prox_ir = rospy.Publisher('prox_ir',Proximity_IR, queue_size=10)
         pub_sharp = rospy.Publisher('sharp_ir', Sharp_IR, queue_size=10)
         pub_wl = rospy.Publisher('wl',WhiteLine_Sensor , queue_size=10)
         start_time = rospy.get_time()
-        rospy.Service('vel_to_PWM', VelToPWM, Vel_to_PWM)
+        # rospy.Service('vel_to_PWM', VelToPWM, Vel_to_PWM)
+
 
         rate = rospy.Rate(10) #Since bot sends data at 25hz the publisher will be forced to slow down
         while not rospy.is_shutdown():
             encoderOut()
-            Prox_IR()
-            sharp_ir()
-            White_sense()
-            # rate.sleep()
+            # Prox_IR()
+            # sharp_ir()
+            # White_sense()
+            rate.sleep()
     except rospy.ROSInterruptException:
         pass
