@@ -189,12 +189,12 @@ if __name__ == '__main__':
         # rospy.Service('vel_to_PWM', VelToPWM, Vel_to_PWM)
 
 
-        rate = rospy.Rate(10) #Since bot sends data at 25hz the publisher will be forced to slow down
+        rate = rospy.Rate(50) #Since bot sends data at 25hz the publisher will be forced to slow down
         while not rospy.is_shutdown():
             encoderOut()
-            # Prox_IR()
-            # sharp_ir()
-            # White_sense()
+            Prox_IR()
+            sharp_ir()
+            White_sense()
             rate.sleep()
     except rospy.ROSInterruptException:
         pass

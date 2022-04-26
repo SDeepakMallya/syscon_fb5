@@ -177,7 +177,7 @@ if __name__ == '__main__':
         f.write("{}: {}\n".format(label1[3],processed_data[3]))      
         f.write("{}: {}\n".format(label1[4],processed_data[4]))  
         f.write("{}: {}\n".format(label1[5],processed_data[5]))
-        f.write("bot_id: 12\n") 
+        f.write("bot_id: 13\n") 
 
 
         for i in range(len(labels)):
