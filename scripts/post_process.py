@@ -80,7 +80,7 @@ def process_data(dir_name):
         if not is_stationary(x_pos, y_pos):
             cen_x, cen_y, rad = circ.gauss_newton(x_pos, y_pos)
             cen = (cen_x, cen_y)
-            vel, ang_vel = circ.get_velocities(cen, rad, init_pos, fin_pos, mid_pos, duration, motion)
+            vel, ang_vel = circ.get_velocities(cen, rad, init_pos, mid_pos, fin_pos, duration, motion)
             
             max_lin_vel_forward = max(max_lin_vel_forward,vel)
             max_lin_vel_backward = min(max_lin_vel_backward,vel)
