@@ -68,15 +68,27 @@ def get_velocities(cen, rad, pos_1, pos_2, pos_3, duration, motion):
     ang1 = math.atan2(pos_1[1] - cen[1], pos_1[0] - cen[0]) % (2 * math.pi)
     ang2 = math.atan2(pos_2[1] - cen[1], pos_2[0] - cen[0]) % (2 * math.pi)
     ang3 = math.atan2(pos_3[1] - cen[1], pos_3[0] - cen[0]) % (2 * math.pi)
-    if (ang1 < ang2) and (ang3 < ang1 or ang3 > ang2):
+
+    exp1 = (pos_1[0] - cen[0]) * (pos_2[1] - cen[1]) - (pos_2[0] - cen[0]) * (pos_1[1] - cen[1])
+    exp2 = (pos_2[0] - cen[0]) * (pos_3[1] - cen[1]) - (pos_3[0] - cen[0]) * (pos_2[1] - cen[1])
+
+    if exp1 < 0 and exp2 < 0:
         ang_vel = -1
-    elif (ang3 < ang1) and (ang3 > ang2):
+    elif exp1 > 0 and exp2 < 0:
         ang_vel = -1
     
     if motion == 'backward':
         lin_vel = -1
 
-    ang_vel *= (ang_vel * (ang2 - ang1)) % (2 * math.pi) / duration
+    ang = ang3 - ang1
+    if ang < 0 and ang_vel >= 0:
+        ang_vel = ang % (2 * math.pi) / duration
+    elif ang < 0 and ang_vel < 0:
+        ang_vel = ang / duration 
+    elif ang >= 0 and ang_vel >= 0:
+        ang_vel = ang / duration
+    else:
+        ang_vel = ang % (2 * math.pi) / (-duration)
 
     lin_vel *= abs(rad * ang_vel)
 
